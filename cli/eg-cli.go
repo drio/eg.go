@@ -1,9 +1,9 @@
 package main
 
 import (
-	"net"
-	"log"
 	"github.com/drio/eg.go"
+	"log"
+	"net"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	eg.CheckError(err)
 
 	log.Printf("Starting server on port %s", service)
-	n := 0  // Number of connections since we started
+	n := 0 // Number of connections since we started
 	for {
 		conn, err := listener.Accept()
 		log.Printf("A new connection: %d\n", n)

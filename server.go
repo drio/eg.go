@@ -1,14 +1,14 @@
 package eg
 
 import (
+	"log"
 	"net"
 	"os"
-	"log"
 	"strconv"
 )
 
 func HandleClient(conn net.Conn, n int) {
-  f, err := os.OpenFile(strconv.Itoa(n), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
+	f, err := os.OpenFile(strconv.Itoa(n), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
 	if err != nil {
 		log.Panicln("Problems opening file.")
 		return
@@ -34,4 +34,3 @@ func HandleClient(conn net.Conn, n int) {
 		}
 	}
 }
-

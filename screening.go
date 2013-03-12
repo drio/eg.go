@@ -1,10 +1,9 @@
 package eg
 
 import (
-	"fmt"
+  "fmt"
 )
 
 func Screen() {
-	fmt.Println("Todo ..")
+  fmt.Println("Todo ..")
 }
-

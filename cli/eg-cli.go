@@ -1,22 +1,22 @@
 package main
 
 import (
+  "github.com/drio/drio.go/common/files"
+  "github.com/drio/eg.go"
   "log"
   "net"
-	"os"
-  "github.com/drio/eg.go"
-  "github.com/drio/drio.go/common/files"
+  "os"
 )
 
 func main() {
-	probes := eg.Probes{}
+  probes := eg.Probes{}
 
-	if len(os.Args) != 2 {
-		panic("Usage: tool <probe_file_name>")
-	}
-	probes_fd, probes_rd := files.Xopen(os.Args[1])
-	defer probes_fd.Close()
-	probes.Init(probes_rd)
+  if len(os.Args) != 2 {
+    panic("Usage: tool <probe_file_name>")
+  }
+  probes_fd, probes_rd := files.Xopen(os.Args[1])
+  defer probes_fd.Close()
+  probes.Init(probes_rd)
 
   service := ":8000"
   tcpAddr, err := net.ResolveTCPAddr("tcp4", service)

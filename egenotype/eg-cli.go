@@ -1,26 +1,26 @@
 package main
 
 import (
+  "fmt"
   "github.com/drio/drio.go/common/files"
   "github.com/drio/eg.go"
   "log"
   "net"
   "os"
-	"fmt"
 )
 
 func main() {
   if len(os.Args) != 2 {
     fmt.Fprintf(os.Stderr, "Usage: tool <probe_file_name>\n")
-		os.Exit(1)
+    os.Exit(1)
   }
 
   log.Printf("Loading probes.")
-	probes := loadProbes()
-	log.Printf("Number of probes loaded: %d\n", probes.NumLoaded())
+  probes := loadProbes()
+  log.Printf("Number of probes loaded: %d\n", probes.NumLoaded())
 
-	// start server or screen
-	startServer()
+  // start server or screen
+  startServer()
 }
 
 func loadProbes() eg.Probes {
@@ -28,7 +28,7 @@ func loadProbes() eg.Probes {
   fd, rd := files.Xopen(os.Args[1]) // filedesc, reader for probes
   probes.Load(rd)
   fd.Close()
-	return probes
+  return probes
 }
 
 func startServer() {
@@ -51,5 +51,3 @@ func startServer() {
     n++
   }
 }
-
-

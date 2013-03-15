@@ -6,18 +6,32 @@ import (
   "log"
   "net"
   "os"
+	"fmt"
 )
 
 func main() {
-  probes := eg.Probes{}
-
   if len(os.Args) != 2 {
-    panic("Usage: tool <probe_file_name>")
+    fmt.Fprintf(os.Stderr, "Usage: tool <probe_file_name>\n")
+		os.Exit(1)
   }
-  probes_fd, probes_rd := files.Xopen(os.Args[1])
-  defer probes_fd.Close()
-  probes.Init(probes_rd)
 
+  log.Printf("Loading probes.")
+	probes := loadProbes()
+	log.Printf("Number of probes loaded: %d\n", probes.NumLoaded())
+
+	// start server or screen
+	startServer()
+}
+
+func loadProbes() eg.Probes {
+  probes := eg.Probes{}
+  fd, rd := files.Xopen(os.Args[1]) // filedesc, reader for probes
+  probes.Load(rd)
+  fd.Close()
+	return probes
+}
+
+func startServer() {
   service := ":8000"
   tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
   eg.CheckError(err)
@@ -37,3 +51,5 @@ func main() {
     n++
   }
 }
+
+

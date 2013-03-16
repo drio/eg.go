@@ -7,6 +7,15 @@ import (
   "strings"
 )
 
+type probeError struct {
+	Where string
+	What string
+}
+
+func (e probeError) Error() string {
+	return fmt.Sprintf("Error in %s: %s ", e.Where, e.What)
+}
+
 // 1   100006955   rs4908018   TTTGTCTAAAACAAC CTTTCACTAGGCTCA C   A
 // Slice of ids [ id1, id2, .... ]
 // Probes is a map from [SEQ N SEQ]     -> slice position
@@ -42,34 +51,42 @@ func (p *Probes) CheckHit(subread string) (string, bool) {
 }
 
 // Load loads the probes in r to probes
-func (p *Probes) Load(r *bufio.Reader) {
+func (p *Probes) Load(r *bufio.Reader) error {
   p.Init()
   p.n_loaded = 0
   expected_n_columns_in_line := 7
   for l := range files.IterLines(r) {
     ss := strings.Split(l, "\t")
     if len(ss) != expected_n_columns_in_line {
-      panic(fmt.Sprintf("Invalid probe line: %s", l))
+      return probeError {
+				"Probes.Load()",
+				fmt.Sprintf("Invalid # of fields in input probes; line: %d", p.n_loaded),
+			}
     }
     id, five, three := ss[2], ss[3], ss[4]
     p.add(id, five, three)
   }
+	return nil
 }
 
 // add adds a new probe to p given the id of the probe and
 // the five and three prime sequence
-func (p *Probes) add(id, five, three string) {
+func (p *Probes) add(id, five, three string) error {
   if p.IsEmpty() { // First time we load a probe, set the size
     p.p_size = len(five) + len(three) + 1
   } else {
     if p.p_size != len(five)+len(three)+1 {
-      panic(fmt.Sprintf("Different probe lenghts."))
+      return probeError {
+				"Probes.add()",
+				"Different probe lengths.",
+			}
     }
   }
   //TODO: reverse complement !!
   p.ids = append(p.ids, id)
   p.seq[five+"N"+three] = p.n_loaded
   p.n_loaded++
+	return nil
 }
 
 func (p *Probes) IsEmpty() bool {

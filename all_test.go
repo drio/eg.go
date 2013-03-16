@@ -32,11 +32,22 @@ func testHit(probes *Probes, id, read string, t *testing.T, should_hit bool) {
   }
 }
 
+func TestDifferentProbeLengths(t *testing.T) {
+  probes := setProbes()
+	if err := probes.add("id1", "AAA", "CCC"); err != nil {
+    t.Errorf("Getting error when adding first probe ")
+	}
+	if err := probes.add("id2", "AAAT", "GCCC"); err == nil {
+    t.Errorf("Should have gotten an error when inserting probe of different size")
+	}
+}
+
 func TestBasicCheckHit(t *testing.T) {
   should_hit := true
   probes := setProbes()
+
   id := "id1"
-  probes.add("id1", "AAA", "CCC")
+  probes.add(id, "AAA", "CCC")
   testHit(probes, id, "AAATCCC", t, should_hit)
   testHit(probes, id, "ACATCCC", t, !should_hit)
   testHit(probes, id, "AAATCCT", t, !should_hit)

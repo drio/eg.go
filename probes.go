@@ -7,15 +7,6 @@ import (
   "strings"
 )
 
-type probeError struct {
-	Where string
-	What string
-}
-
-func (e probeError) Error() string {
-	return fmt.Sprintf("Error in %s: %s ", e.Where, e.What)
-}
-
 // 1   100006955   rs4908018   TTTGTCTAAAACAAC CTTTCACTAGGCTCA C   A
 // Slice of ids [ id1, id2, .... ]
 // Probes is a map from [SEQ N SEQ]     -> slice position
@@ -58,15 +49,15 @@ func (p *Probes) Load(r *bufio.Reader) error {
   for l := range files.IterLines(r) {
     ss := strings.Split(l, "\t")
     if len(ss) != expected_n_columns_in_line {
-      return probeError {
-				"Probes.Load()",
-				fmt.Sprintf("Invalid # of fields in input probes; line: %d", p.n_loaded),
-			}
+      return egError{
+        "Probes.Load()",
+        fmt.Sprintf("Invalid # of fields in input probes; line: %d", p.n_loaded),
+      }
     }
     id, five, three := ss[2], ss[3], ss[4]
     p.add(id, five, three)
   }
-	return nil
+  return nil
 }
 
 // add adds a new probe to p given the id of the probe and
@@ -76,17 +67,20 @@ func (p *Probes) add(id, five, three string) error {
     p.p_size = len(five) + len(three) + 1
   } else {
     if p.p_size != len(five)+len(three)+1 {
-      return probeError {
-				"Probes.add()",
-				"Different probe lengths.",
-			}
+      return egError{
+        "Probes.add()",
+        "Different probe lengths.",
+      }
     }
   }
-  //TODO: reverse complement !!
   p.ids = append(p.ids, id)
-  p.seq[five+"N"+three] = p.n_loaded
-  p.n_loaded++
-	return nil
+  probeSeq := five + "N" + three
+  p.seq[probeSeq] = p.n_loaded
+  // We have to add the RC also; the probe id will be the same
+  rc := ReverseComplement(&probeSeq)
+  p.seq[*rc] = p.n_loaded
+  p.n_loaded++ // We only count 1 probe
+  return nil
 }
 
 func (p *Probes) IsEmpty() bool {

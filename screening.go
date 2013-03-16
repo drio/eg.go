@@ -13,9 +13,10 @@ func Screen(probes *Probes, read string) []Hit {
   probe_len := probes.Psize()
   middle := probe_len / 2
   for i := 0; i <= len(read)-probe_len; i++ {
-    subread := []byte(read[i : probe_len+1])
+    subread := []byte(read[i : i+probe_len])
     nt := byte(subread[middle])
     subread[middle] = 'N'
+    //fmt.Printf("subread: %s\n", string(subread))
     if probe_id, matches := probes.CheckHit(string(subread)); matches {
       hits = append(hits, Hit{probe_id, nt})
     }

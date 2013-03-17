@@ -1,5 +1,11 @@
 package eg
 
+import (
+	"io"
+	"github.com/drio/drio.go/bio/fasta"
+	"fmt"
+)
+
 type Hit struct {
   ProbeId string
   Base    byte
@@ -22,4 +28,14 @@ func Screen(probes *Probes, read string) []Hit {
     }
   }
   return hits
+}
+
+// Compute iterates over fq and screens each read against the probes. All the
+// hits found are dump to outputF
+func Compute(fqr fasta.FqReader, probes Probes, outputF io.Writer)  {
+	for r, done := fqr.Iter(); !done; r, done = fqr.Iter() {
+		for _, hit := range(Screen(&probes, r.Seq)) {
+			fmt.Printf("%s\t%c\n", hit.ProbeId, hit.Base)
+		}
+	}
 }

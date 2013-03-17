@@ -3,6 +3,7 @@ package main
 import (
   "fmt"
   "github.com/drio/drio.go/common/files"
+  "github.com/drio/drio.go/bio/fasta"
   "github.com/drio/eg.go"
   "log"
   "net"
@@ -10,8 +11,8 @@ import (
 )
 
 func main() {
-  if len(os.Args) != 2 {
-    fmt.Fprintf(os.Stderr, "Usage: tool <probe_file_name>\n")
+  if len(os.Args) != 3 {
+    fmt.Fprintf(os.Stderr, "Usage: tool <probe_file_name> <reads.fa>\n")
     os.Exit(1)
   }
 
@@ -20,7 +21,14 @@ func main() {
   log.Printf("Number of probes loaded: %d\n", probes.NumLoaded())
 
   // start server or screen
-  startServer()
+  //startServer()
+
+	reads_fn := os.Args[2]
+	fpReads, readsReader := files.Xopen(reads_fn)
+	defer fpReads.Close()
+	var fqr fasta.FqReader
+	fqr.Reader = readsReader
+	eg.Compute(fqr, probes, os.Stdin)
 }
 
 func loadProbes() eg.Probes {

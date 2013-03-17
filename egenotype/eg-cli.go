@@ -2,8 +2,8 @@ package main
 
 import (
   "fmt"
-  "github.com/drio/drio.go/common/files"
   "github.com/drio/drio.go/bio/fasta"
+  "github.com/drio/drio.go/common/files"
   "github.com/drio/eg.go"
   "log"
   "net"
@@ -23,12 +23,12 @@ func main() {
   // start server or screen
   //startServer()
 
-	reads_fn := os.Args[2]
-	fpReads, readsReader := files.Xopen(reads_fn)
-	defer fpReads.Close()
-	var fqr fasta.FqReader
-	fqr.Reader = readsReader
-	eg.Compute(fqr, probes, os.Stdin)
+  reads_fn := os.Args[2]
+  fpReads, readsReader := files.Xopen(reads_fn)
+  defer fpReads.Close()
+  var fqr fasta.FqReader
+  fqr.Reader = readsReader
+  eg.Compute(fqr, probes, os.Stdin)
 }
 
 func loadProbes() eg.Probes {

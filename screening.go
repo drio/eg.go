@@ -1,9 +1,9 @@
 package eg
 
 import (
-	"io"
-	"github.com/drio/drio.go/bio/fasta"
-	"fmt"
+  "fmt"
+  "github.com/drio/drio.go/bio/fasta"
+  "io"
 )
 
 type Hit struct {
@@ -32,10 +32,10 @@ func Screen(probes *Probes, read string) []Hit {
 
 // Compute iterates over fq and screens each read against the probes. All the
 // hits found are dump to outputF
-func Compute(fqr fasta.FqReader, probes Probes, outputF io.Writer)  {
-	for r, done := fqr.Iter(); !done; r, done = fqr.Iter() {
-		for _, hit := range(Screen(&probes, r.Seq)) {
-			fmt.Printf("%s\t%c\n", hit.ProbeId, hit.Base)
-		}
-	}
+func Compute(fqr fasta.FqReader, probes Probes, outputF io.Writer) {
+  for r, done := fqr.Iter(); !done; r, done = fqr.Iter() {
+    for _, hit := range Screen(&probes, r.Seq) {
+      fmt.Printf("%s\t%c\n", hit.ProbeId, hit.Base)
+    }
+  }
 }

@@ -21,14 +21,8 @@ func main() {
   log.Printf("Number of probes loaded: %d\n", probes.NumLoaded())
 
   // start server or screen
-  //startServer()
-
-  reads_fn := os.Args[2]
-  fpReads, readsReader := files.Xopen(reads_fn)
-  defer fpReads.Close()
-  var fqr fasta.FqReader
-  fqr.Reader = readsReader
-  eg.Compute(fqr, probes, os.Stdin)
+  startServer(probes)
+  //standalone(probes)
 }
 
 func loadProbes() eg.Probes {
@@ -39,7 +33,18 @@ func loadProbes() eg.Probes {
   return probes
 }
 
-func startServer() {
+func standalone(probes eg.Probes) {
+  log.Printf("Screening reads in standalone mode.")
+  reads_fn := os.Args[2]
+  fpReads, readsReader := files.Xopen(reads_fn)
+  defer fpReads.Close()
+  var fqr fasta.FqReader
+  fqr.Reader = readsReader
+  eg.Compute(fqr, probes, os.Stdin)
+  log.Printf("Done.")
+}
+
+func startServer(probes eg.Probes) {
   service := ":8000"
   tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
   eg.CheckError(err)
@@ -51,11 +56,10 @@ func startServer() {
   n := 0 // Number of connections since we started
   for {
     conn, err := listener.Accept()
-    log.Printf("A new connection: %d\n", n)
     if err != nil {
       continue
     }
-    go eg.HandleClient(conn, n)
+    go eg.HandleClient(conn, n, probes)
     n++
   }
 }

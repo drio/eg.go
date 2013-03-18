@@ -1,36 +1,34 @@
 package eg
 
 import (
+  "bufio"
+  "github.com/drio/drio.go/bio/fasta"
   "log"
   "net"
   "os"
   "strconv"
 )
 
-func HandleClient(conn net.Conn, n int) {
-  f, err := os.OpenFile(strconv.Itoa(n), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
+func HandleClient(conn net.Conn, n int, probes Probes) {
+  log.Printf("A new connection: %d", n)
+
+  // Open the output file
+  fdOut, err := os.OpenFile(strconv.Itoa(n), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
   if err != nil {
     log.Panicln("Problems opening file.")
     return
   }
 
   // close connection and file on exit
-  defer f.Close()
+  defer fdOut.Close()
   defer conn.Close()
 
-  var buf [65536]byte
-  for {
-    // read in buffer
-    n, err := conn.Read(buf[0:])
-    if err != nil {
-      return
-    }
+  // Create a buffer for the reader (conn - socket)
+  bReader := bufio.NewReader(conn)
+  // Now create a FastaQ reader
+  var fqr fasta.FqReader
+  fqr.Reader = bReader
+  Compute(fqr, probes, fdOut)
 
-    // write the n bytes read to file
-    _, err = f.Write(buf[0:n])
-    if err != nil {
-      log.Panicln("Problems writing to file.")
-      return
-    }
-  }
+  log.Printf("Done with connection %d.", n)
 }

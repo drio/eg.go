@@ -35,7 +35,7 @@ func Screen(probes *Probes, read string) []Hit {
 func Compute(fqr fasta.FqReader, probes Probes, outputF io.Writer) {
   for r, done := fqr.Iter(); !done; r, done = fqr.Iter() {
     for _, hit := range Screen(&probes, r.Seq) {
-      fmt.Printf("%s\t%c\n", hit.ProbeId, hit.Base)
+      fmt.Fprintf(outputF, "%s\t%c\n", hit.ProbeId, hit.Base)
     }
   }
 }

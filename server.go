@@ -7,6 +7,7 @@ import (
   "net"
   "os"
   "strconv"
+	"time"
 )
 
 func HandleClient(conn net.Conn, n int, probes Probes) {
@@ -28,7 +29,12 @@ func HandleClient(conn net.Conn, n int, probes Probes) {
   // Now create a FastaQ reader
   var fqr fasta.FqReader
   fqr.Reader = bReader
-  Compute(fqr, probes, fdOut)
 
-  log.Printf("Done with connection %d.", n)
+	t0 := time.Now()
+	nr := Compute(fqr, probes, fdOut)
+	t1 := time.Now()
+
+	rps := nr / int64(t1.Sub(t0).Seconds())
+	log.Printf("Done with %d; Computed %d reads in %v; %v reads/sec.",
+		n, nr, t1.Sub(t0), rps)
 }

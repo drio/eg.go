@@ -32,10 +32,13 @@ func Screen(probes *Probes, read string) []Hit {
 
 // Compute iterates over fq and screens each read against the probes. All the
 // hits found are dump to outputF
-func Compute(fqr fasta.FqReader, probes Probes, outputF io.Writer) {
+func Compute(fqr fasta.FqReader, probes Probes, outputF io.Writer) int64 {
+	n_reads := int64(0)
   for r, done := fqr.Iter(); !done; r, done = fqr.Iter() {
+		n_reads++
     for _, hit := range Screen(&probes, r.Seq) {
       fmt.Fprintf(outputF, "%s\t%c\n", hit.ProbeId, hit.Base)
     }
   }
+	return n_reads
 }
